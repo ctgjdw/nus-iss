@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workshop 01</title>
+    <link rel="stylesheet" href="{{ url_for("static", filename = "style.css") }}">
+</head>
+<body>
+    <div class="pic">
+        <img src={{ url_for("static", filename = "img.jpg") }} class="image"></img>
+    </div>
+    <div class="text">
+        <p>{{ sentence }}</p>
+    </div>
+    <div class="link">
+        Repository
+        <a href="https://github.com">https://github.com</a>
+    </div>
+</body>
+</html>

@@ -1,0 +1,29 @@
+.text {
+    padding: 3px;
+    margin: 3px;
+    width: 65%;
+}
+
+.link {
+    justify-self: center;
+    margin: 0 auto;
+}
+
+.pic {
+    width: 20%;
+}
+
+.image {
+    width: 100%;
+}
+
+/* styles.css */
+body {
+    margin: 0;
+    /* Remove default margin to fill the entire viewport */
+    padding: 0;
+    /* Remove default padding */
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+}
