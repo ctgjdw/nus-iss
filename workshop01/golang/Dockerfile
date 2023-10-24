@@ -10,6 +10,8 @@ RUN CGO_ENABLED=true go build -o main ./...
 
 FROM debian:bookworm
 
+RUN apt update && apt install -y curl
+
 WORKDIR /app
 
 COPY --from=builder /app/main .
