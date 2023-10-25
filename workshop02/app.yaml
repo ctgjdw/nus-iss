@@ -1,0 +1,83 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: bggapp-cm
+  namespace: bggns
+  labels:
+    app: bggapp
+data:
+  BGG_DB_USER: root
+  BGG_DB_HOST: bggdb-svc.bggns.svc.cluster.local
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: bggapp-secret
+  namespace: bggns
+  labels:
+    app: bggapp
+type: Opaque
+data:
+  BGG_DB_PASSWORD: Y2hhbmdlaXQ=
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bggapp-deploy
+  namespace: bggns
+  labels:
+    app: bggapp
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: bggapp
+  template:
+    metadata:
+      labels:
+        app: bggapp
+    spec:
+      containers:
+      - name: bggapp
+        image: stackupiss/bgg-backend:v2
+        livenessProbe:
+          initialDelaySeconds: 5
+          periodSeconds: 30
+          httpGet:
+            port: 3000
+            path: /healthz
+        readinessProbe:
+          initialDelaySeconds: 5
+          httpGet:
+            port: 3000
+            path: /healthz
+        envFrom:
+          - configMapRef:
+              name: bggapp-cm
+          - secretRef:
+              name: bggapp-secret
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 3000
+          name: app-port
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: bggapp-svc
+  namespace: bggns
+  labels:
+    app: bggapp
+spec:
+  type: NodePort
+  selector:
+    app: bggapp
+  ports:
+  - port: 3000
+    targetPort: app-port
+    name: app-port
+    nodePort: 31000
