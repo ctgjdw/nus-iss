@@ -9,7 +9,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-    - host: localhost
+    - host: code-130.16.2.33.nip.io
       http:
         paths:
           - pathType: Prefix
