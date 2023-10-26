@@ -32,8 +32,8 @@ spec:
                 name: code-server-configs
           resources:
             limits:
-              memory: "256Mi"
-              cpu: "200m"
+              memory: "1Gi"
+              cpu: "1"
           ports:
             - containerPort: 8443
               name: app-port
