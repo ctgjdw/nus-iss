@@ -1,0 +1,78 @@
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: minio
+  labels:
+    app: minio
+spec:
+  selector:
+    matchLabels:
+      app: minio
+  serviceName: minio-headless
+  replicas: 4
+  template:
+    metadata:
+      labels:
+        app: minio
+    spec:
+      securityContext:
+        fsGroup: 1001
+      initContainers:
+        - name: update-data-dir
+          image: busybox
+          command:
+            - chown
+            - -R
+            - 1001:1001
+            - /data
+          volumeMounts:
+            - name: data-vol
+              mountPath: /data
+      containers:
+        - name: minio
+          image: bitnami/minio@sha256:63fd32b5fdbedc7cf7252e0420f4402c9da95c3268b2e894b7cd6f71889931f0
+          envFrom:
+            - secretRef:
+                name: minio-config
+          command:
+            - minio
+            - server
+          args:
+            - --address=:9000
+            - --console-address=:9090
+            - http://minio-{0...3}.minio-headless.minio.svc.cluster.local/data
+          ports:
+            - containerPort: 9000
+              name: data
+            - containerPort: 9090
+              name: console
+          volumeMounts:
+            - name: data-vol
+              mountPath: /data
+          resources:
+            limits:
+              memory: "1Gi"
+              cpu: "500m"
+          livenessProbe:
+            httpGet:
+              path: /minio/health/live
+              port: 9000
+            initialDelaySeconds: 60
+            timeoutSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /minio/health/ready
+              port: 9000
+            initialDelaySeconds: 60
+            timeoutSeconds: 10
+  volumeClaimTemplates:
+    - metadata:
+        name: data-vol
+        labels:
+          consumed-by: minio
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 1Gi
