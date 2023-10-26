@@ -1,0 +1,39 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: code-server
+  namespace: code-server
+  labels:
+    app: code-server
+spec:
+  selector:
+    matchLabels:
+      app: code-server
+  template:
+    metadata:
+      labels:
+        app: code-server
+    spec:
+      volumes:
+        - name: code-server
+          persistentVolumeClaim:
+            claimName: code-server
+      containers:
+        - name: code-server
+          image: linuxserver/code-server@sha256:28790a3311fc481a9ad82115e54edd955dd001a87289fe073145ad804a34f90d
+          volumeMounts:
+            - name: code-server
+              mountPath: /config/workspace
+          envFrom:
+            - secretRef:
+                name: code-server-configs
+            - configMapRef:
+                name: code-server-configs
+          resources:
+            limits:
+              memory: "256Mi"
+              cpu: "200m"
+          ports:
+            - containerPort: 8443
+              name: app-port
