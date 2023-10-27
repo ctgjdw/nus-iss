@@ -1,0 +1,75 @@
+commands:
+  - exec:
+      commandLine: npm install
+      component: runtime
+      group:
+        isDefault: true
+        kind: build
+      workingDir: ${PROJECT_SOURCE}
+    id: install
+  - exec:
+      commandLine: npm start
+      component: runtime
+      group:
+        isDefault: true
+        kind: run
+      workingDir: ${PROJECT_SOURCE}
+    id: run
+  - id: deploy
+    composite:
+      commands:
+        - build-image
+      group:
+        isDefault: true
+        kind: deploy
+  - id: build-image
+    apply:
+      component: outerloop-build
+components:
+  - container:
+      args:
+        - tail
+        - -f
+        - /dev/null
+      endpoints:
+        - name: http-node
+          targetPort: 3000
+        - exposure: none
+          name: debug
+          targetPort: 5858
+      env:
+        - name: DEBUG_PORT
+          value: "5858"
+        - name: INSTANCE_NAME
+          value: test
+        - name: INSTANCE_HASH
+          value: Hello!
+      image: registry.access.redhat.com/ubi8/nodejs-16:latest
+      memoryLimit: 1024Mi
+      mountSources: true
+    name: runtime
+  - image:
+      dockerfile:
+        buildContext: ${PROJECT_SOURCE}
+        rootRequired: false
+        uri: Dockerfile
+      imageName: docker.io/ctg96/dov:1
+    name: outerloop-build
+metadata:
+  description: Node.js 16 application
+  displayName: Node.js Runtime
+  icon: https://nodejs.org/static/images/logos/nodejs-new-pantone-black.svg
+  language: JavaScript
+  name: dov-bear
+  projectType: Node.js
+  tags:
+    - Node.js
+    - Express
+    - ubi8
+  version: 2.1.1
+schemaVersion: 2.2.0
+starterProjects:
+  - git:
+      remotes:
+        origin: https://github.com/odo-devfiles/nodejs-ex.git
+    name: nodejs-starter
