@@ -19,13 +19,31 @@ commands:
     composite:
       commands:
         - build-image
+        - deploy-to-oc
       group:
         isDefault: true
         kind: deploy
   - id: build-image
     apply:
       component: outerloop-build
+      group:
+        kind: build
+  - id: deploy-to-oc
+    exec:
+      commandLine: oc new-app --image docker.io/ctg96/dov:1 --name dov -n staging || oc import-image docker.io/ctg96/dov:1 -n staging
+      component: oc-cli
+      group:
+        kind: deploy
 components:
+  - container:
+      image: image-registry.openshift-image-registry.svc:5000/openshift/cli
+      mountSources: false
+      dedicatedPod: true
+    name: oc-cli
+    attributes:
+      pod-overrides:
+        spec:
+          serviceAccountName: deployer
   - container:
       args:
         - tail
