@@ -65,7 +65,7 @@ components:
           completionMode: Indexed
           suspend: false
     name: oc-deploy
-  - name: tools
+  - name: devspaces-container
     container:
       image: quay.io/devfile/universal-developer-image:ubi8-latest
       memoryLimit: 1G
