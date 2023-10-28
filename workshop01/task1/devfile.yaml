@@ -68,35 +68,30 @@ components:
   - name: tools
     container:
       image: quay.io/devfile/universal-developer-image:ubi8-latest
-      endpoints:
-        - exposure: public
-          name: nodejs
-          protocol: http
-          targetPort: 3000
       memoryLimit: 1G
       mountSources: true
-  # - container:
-  #     args:
-  #       - tail
-  #       - -f
-  #       - /dev/null
-  #     endpoints:
-  #       - name: http-node
-  #         targetPort: 3000
-  #       - exposure: none
-  #         name: debug
-  #         targetPort: 5858
-  #     env:
-  #       - name: DEBUG_PORT
-  #         value: "5858"
-  #       - name: INSTANCE_NAME
-  #         value: test
-  #       - name: INSTANCE_HASH
-  #         value: Hello!
-  #     image: registry.access.redhat.com/ubi8/nodejs-16:latest
-  #     memoryLimit: 1024Mi
-  #     mountSources: true
-  #   name: runtime
+  - container:
+      args:
+        - tail
+        - -f
+        - /dev/null
+      endpoints:
+        - name: http-node
+          targetPort: 3000
+        - exposure: none
+          name: debug
+          targetPort: 5858
+      env:
+        - name: DEBUG_PORT
+          value: "5858"
+        - name: INSTANCE_NAME
+          value: test
+        - name: INSTANCE_HASH
+          value: Hello!
+      image: registry.access.redhat.com/ubi8/nodejs-16:latest
+      memoryLimit: 1024Mi
+      mountSources: true
+    name: runtime
   - image:
       dockerfile:
         buildContext: ${PROJECT_SOURCE}
